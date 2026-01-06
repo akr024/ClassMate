@@ -1,7 +1,5 @@
 import mongoose, {Schema, model} from 'mongoose'
 
-// mongoose.connect("") - connect to db, later
-
 const userSchema = new Schema({
     email: {type: String, unique: true, required: true}, // validate its ends with "@northeastern.edu"
     password: {type: String, required: true},

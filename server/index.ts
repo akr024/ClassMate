@@ -1,6 +1,7 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import cors from 'cors';
+import { authMiddleware } from './auth.js';
 
 const app = express();
 
@@ -37,12 +38,12 @@ app.get('/api/v1/courses/:course', (req, res) => {
 })
 
 // register for a specific course - authenticated
-app.post('/api/v1/courses/:course', (req, res) => {
+app.post('/api/v1/courses/:course', authMiddleware, (req, res) => {
 
 })
 
 // unregister from a course - authenticated
-app.post('/api/v1/courses/:course', (req, res) => {
+app.post('/api/v1/courses/:course', authMiddleware, (req, res) => {
 
 })
 
@@ -65,5 +66,6 @@ app.delete('/api/v1/admin/courses/:course', (req, res) => {
 
 // start server
 app.listen(3000, () => {
+    // mongoose.connect("") - connect to db, later
     console.log("Server started on PORT 3000!")
 })
