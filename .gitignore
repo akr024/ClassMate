@@ -1,0 +1,52 @@
+# Operating System Files
+.DS_Store
+Thumbs.db
+
+# Build Artifacts
+build/
+dist/
+target/
+*.class
+*.jar
+*.war
+*.exe
+*.dll
+*.obj
+*.o
+
+# Dependency Directories
+node_modules/
+vendor/
+venv/
+*.egg-info/
+
+# IDE and Editor Files
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.bak
+*~
+
+# Log and Temporary Files
+*.log
+tmp/
+temp/
+
+# Environment Variables and Sensitive Data
+.env
+.env.*
+config.local.json
+*.pem
+*.key
+
+# Test and Coverage Reports
+coverage/
+.nyc_output/
+
+# User-specific files
+*.user
