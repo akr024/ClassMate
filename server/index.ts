@@ -88,7 +88,10 @@ app.post('/api/v1/admin/login', (req, res) => {
 
 // view all courses - public
 app.get('/api/v1/courses', (req, res) => {
-
+    const courses = CourseModel.find();
+    res.json({
+        courses
+    });
 })
 
 // view a specific course information - public
