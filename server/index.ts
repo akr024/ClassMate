@@ -86,9 +86,9 @@ app.post('/api/v1/admin/login', (req, res) => {
 
 // STUDENT COURSE ENDPOINTS -----------
 
-// view all courses - public
+// view all courses - public, excluding description
 app.get('/api/v1/courses', (req, res) => {
-    const courses = CourseModel.find();
+    const courses = CourseModel.find().select("-description");
     res.json({
         courses
     });
@@ -96,7 +96,20 @@ app.get('/api/v1/courses', (req, res) => {
 
 // view a specific course information - public
 app.get('/api/v1/courses/:course', (req, res) => {
+    const courseId = req.params.course;
+    const course = CourseModel.findOne({
+        courseId: courseId
+    })
+    if(!course){
+        res.json({
+            message: "Error, the course does not exist"
+        })
+        return;
+    }
 
+    res.json({
+        description: course
+    })
 })
 
 // register for a specific course - authenticated
