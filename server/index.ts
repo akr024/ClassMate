@@ -37,9 +37,11 @@ app.post('/api/v1/signup', async (req, res) => {
         })
         return;
     } catch(err){
-        res.status(400).json({
-            message: "User could not be created\n" + err
+        if(err instanceof Error){
+            res.status(400).json({
+            message: "User could not be created due to following error:\n" + err.message
         })
+        }
         return;
     }
 
@@ -70,12 +72,20 @@ app.post('/api/v1/login', async (req, res) => {
                 token: token
             })
             return;
+        } else {
+            return res.status(401).json({
+                message: "Invalid token"
+            })
         }
     } catch(err){
-        res.status(400).json({
-            message: "User could not be created\n" + err
+        if(err instanceof Error){
+            return res.status(400).json({
+                message: "User could not be signed in:\n" + err.message
+            })   
+        }
+        return res.status(500).json({
+            message: "User could not be signed in"
         })
-        return;
     }
 })
 
