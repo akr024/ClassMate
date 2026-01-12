@@ -128,7 +128,7 @@ app.post('/api/v1/courses/:course', authMiddleware, (req, res) => {
 })
 
 // unregister from a course - authenticated
-app.post('/api/v1/courses/:course', authMiddleware, (req, res) => {
+app.delete('/api/v1/courses/:course', authMiddleware, (req, res) => {
 
 })
 
