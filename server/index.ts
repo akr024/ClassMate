@@ -105,9 +105,9 @@ app.get('/api/v1/courses', (req, res) => {
 })
 
 // view a specific course information - public
-app.get('/api/v1/courses/:course', (req, res) => {
-    const courseId = req.params.course;
-    const course = CourseModel.findOne({
+app.get('/api/v1/courses/:course', async (req, res) => {
+    const courseId = req.params.course as string;
+    const course = await CourseModel.findOne({
         courseId: courseId
     })
     if(!course){
@@ -118,12 +118,72 @@ app.get('/api/v1/courses/:course', (req, res) => {
     }
 
     res.json({
-        description: course
+        course: course
     })
 })
 
 // register for a specific course - authenticated
-app.post('/api/v1/courses/:course', authMiddleware, (req, res) => {
+app.post('/api/v1/courses/:course', authMiddleware, async (req, res) => {
+    const userId = req.userId;
+    const courseId = req.params.course as string;
+    // check if course has available seats
+    // add the student to the students list of the course
+    // add the course to the students list of registered courses
+    const course = await CourseModel.findOne({
+        courseId: courseId
+    })
+
+    if(!course){
+        return res.status(401).json({
+            message: "Error, course does not exist"
+        })
+    }
+
+    if(course.seats < 1){ // no seat available
+        return res.status(409).json({
+            message: "No seat left unfortunately"
+        })
+    }
+
+    const user = await UserModel.findOne({
+        _id: userId
+    })
+
+    if(!user){
+        return res.status(401).json({
+            message: "Error, user does not exist"
+        })
+    }
+
+    try{
+        await CourseModel.updateOne({
+            course
+        }, {
+            seats: course.seats - 1,
+            students: [...course.students, user]
+        })
+
+        await UserModel.updateOne({
+            user
+        }, {
+            courses: [...user.courses, course]
+        })
+
+        res.status(202).json({
+            message: "Student successfully registered"
+        })
+    } catch(err){
+        if(err instanceof Error){
+            return res.status(500).json({
+                message: "Error: \n" + err.message
+            })
+        }
+        return res.status(500).json({
+            message: "Error in course registration"
+        })
+    }
+
+
 
 })
 
