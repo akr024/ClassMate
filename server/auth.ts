@@ -1,9 +1,19 @@
 import express, { type NextFunction, type Request, type Response } from 'express';
-import jwt from 'jsonwebtoken';
+import jwt, { type JwtPayload } from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET
 
+interface AuthPayload extends JwtPayload {
+  id: string;
+}
+
 export function authMiddleware(req: Request, res: Response, next: NextFunction){
+    if(!JWT_SECRET){
+        return res.status(401).json({
+            message: "No JWT Secret given."
+        });
+    }
+    
     const token = req.headers['Authorization'];
     if(!token || typeof token !== "string"){
         return res.status(401).json({
@@ -11,14 +21,9 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction){
         })
     }
 
-    if(!JWT_SECRET){
-        return res.status(401).json({
-            message: "No JWT Secret given."
-        });
-    }
-
     try{
-        const payload = jwt.verify(token, JWT_SECRET); // this returns the user id, though its not usable anywhere
+        const payload = jwt.verify(token, JWT_SECRET) as AuthPayload; // this returns the user id, though its not usable anywhere
+        req.userId = payload.id;
         res.json({ // optional, for testing purposes
             message: "successful log in",
             payload: payload
