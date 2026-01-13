@@ -15,6 +15,12 @@ const app = express();
 app.use(express.json()); // convert body to json
 // app.use(cors()); - enable later, while connecting frontend
 
+// NEXT STEPS:
+// 1. hit endpoints to see if they work
+// 2. add zod input validation in all endpoints
+// 3. seperate all files into MVC-based structure
+// 4. start with the frontend
+
 // LOGIN/SIGNUP -----------
 
 // sign up student - ideally authenticate student's existence before signing up
