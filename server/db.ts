@@ -11,13 +11,13 @@ const userSchema = new Schema({
 export const UserModel = model("User", userSchema);
 
 // only an existing admin can add another admin - for now, this is how authentication of admins is done
-const adminSchema = new Schema({
-    email: {type: String, unique: true, required: true},
-    password: {type: String, required: true},
-    adminId: {type: Number, required: true, unique: true}
-})
+// const adminSchema = new Schema({
+//     email: {type: String, unique: true, required: true},
+//     password: {type: String, required: true},
+//     adminId: {type: Number, required: true, unique: true}
+// })
 
-export const AdminModel = model("Admin", adminSchema);
+// export const AdminModel = model("Admin", adminSchema);
 
 const courseSchema = new Schema({
     courseName: {type: String, required: true},

@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import cors from 'cors';
 import bcrypt from 'bcrypt'
 import { authMiddleware } from './auth.js';
-import { UserModel, AdminModel, CourseModel } from './db.js';
+import { UserModel, CourseModel } from './db.js';
 
 const JWT_SECRET = process.env.JWT_SECRET
 if (!JWT_SECRET) throw new Error("JWT_SECRET missing");
@@ -247,20 +247,22 @@ app.delete('/api/v1/courses/:course', authMiddleware, async (req, res) => {
 
 // ADMIN COURSE ENDPOINTS -----------
 
+// work on admin points later
+
 // admin: post a new course - admin authenticated
-app.post('/api/v1/admin/courses', (req, res) => {
+// app.post('/api/v1/admin/courses', (req, res) => {
 
-})
+// })
 
-// admin: update an existing course
-app.put('/api/v1/admin/courses/:course', (req, res) => {
+// // admin: update an existing course
+// app.put('/api/v1/admin/courses/:course', (req, res) => {
 
-})
+// })
 
-// admin: delete an existing course
-app.delete('/api/v1/admin/courses/:course', (req, res) => {
+// // admin: delete an existing course
+// app.delete('/api/v1/admin/courses/:course', (req, res) => {
 
-})
+// })
 
 // start server
 app.listen(3000, () => {
