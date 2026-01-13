@@ -299,7 +299,58 @@ app.post('/api/v1/admin/courses', authMiddleware, async (req, res) => {
 // // admin: update an existing course
 // TEMPORARILY, let a student update a course, to test endpoints in frontend
 app.put('/api/v1/admin/courses/:course', authMiddleware, async (req, res) => {
+    const courseName = req.body.courseName;
+    // cannot change a courseId
+    const description = req.body.description;
+    const seats = req.body.seats;
+    const courseId = req.params.course;
+    const userId = req.userId;
 
+    if(!userId){
+        return res.status(400).json({
+            message: "Error: User ID not provided"
+        })
+    }
+
+    if(!courseId){
+        return res.status(401).json({
+            message: "Course ID not provided"
+        })
+    }
+    
+    try{
+        await CourseModel.findOne({
+            courseId: courseId,
+            admin: userId
+        })
+    } catch (err){
+        return res.status(400).json({
+            message: "Error, course not found or user not admin"
+        })
+    }
+    
+    try {
+        await CourseModel.updateOne({
+            courseId: courseId
+        }, {
+            courseName: courseName,
+            description: description,
+            seats: seats
+        })
+
+        res.status(200).json({
+            message: "Course successfully updated"
+        })
+    } catch (err) {
+        if(err instanceof Error){
+            return res.status(501).json({
+                message: "Error: \n" + err.message
+            })
+        } 
+        return res.status(501).json({
+            message: "Error in updating the course"
+        })
+    }
 })
 
 // // admin: delete an existing course
