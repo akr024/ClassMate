@@ -260,9 +260,15 @@ app.delete('/api/v1/courses/:course', authMiddleware, async (req, res) => {
 app.post('/api/v1/admin/courses', authMiddleware, async (req, res) => {
     const courseName = req.body.courseName;
     const courseId = req.body.courseId;
-    const professor = req.body.professor;
     const description = req.body.description;
     const seats = req.body.seats;
+    const userId = req.userId;
+
+    if(!userId){
+        return res.json({
+            message: "UserId not provided"
+        })
+    }
 
     // add input validation for the properties using zod
 
@@ -270,7 +276,7 @@ app.post('/api/v1/admin/courses', authMiddleware, async (req, res) => {
         await CourseModel.create({
             courseName,
             courseId,
-            professor,
+            admin: userId,
             description,
             seats
         })
@@ -292,14 +298,56 @@ app.post('/api/v1/admin/courses', authMiddleware, async (req, res) => {
 
 // // admin: update an existing course
 // TEMPORARILY, let a student update a course, to test endpoints in frontend
-app.put('/api/v1/admin/courses/:course', (req, res) => {
+app.put('/api/v1/admin/courses/:course', authMiddleware, async (req, res) => {
 
 })
 
 // // admin: delete an existing course
 // TEMPORARILY, let a student delete a course, to test endpoints in frontend
-app.delete('/api/v1/admin/courses/:course', (req, res) => {
+app.delete('/api/v1/admin/courses/:course', authMiddleware, async (req, res) => {
+    const courseId = req.params.course;
+    const userId = req.userId;
+    
+    if(!userId){
+        return res.status(401).json({
+            message: "User ID not provided"
+        })
+    }
 
+    if(!courseId){
+        return res.status(401).json({
+            message: "Course ID not provided"
+        })
+    }
+    
+    // improve specific error handling better later
+
+    try{
+        const courseValid = await CourseModel.findOne({
+            courseId: courseId,
+            admin: userId
+        })
+        
+        if (courseValid){
+            await CourseModel.deleteOne({
+                courseId: courseId
+            })
+        }
+
+        return res.status(200).json({
+            message: "Course deleted successfully"
+        })
+    } catch (err){
+        if(err instanceof Error){
+            return res.json({
+                message: "Error \n" + err.message
+            })
+        }
+        
+        return res.status(400).json({
+            message: "Error: Course ID not valid, User not admin, or server error with deletion"
+        })
+    }
 })
 
 // start server
