@@ -4,7 +4,9 @@ import cors from 'cors';
 import bcrypt from 'bcrypt'
 import { authMiddleware } from './auth.js';
 import { UserModel, CourseModel } from './db.js';
+import 'dotenv/config'; // to load env variables
 
+const PORT = process.env.PORT
 const JWT_SECRET = process.env.JWT_SECRET
 if (!JWT_SECRET) throw new Error("JWT_SECRET missing");
 
@@ -402,7 +404,7 @@ app.delete('/api/v1/admin/courses/:course', authMiddleware, async (req, res) => 
 })
 
 // start server
-app.listen(3000, () => {
+app.listen(PORT, () => {
     // mongoose.connect("") - connect to db, later
     console.log("Server started on PORT 3000!")
 })
