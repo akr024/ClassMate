@@ -22,7 +22,8 @@ export const UserModel = model("User", userSchema);
 const courseSchema = new Schema({
     courseName: {type: String, required: true},
     courseId: {type: String, required: true, unique: true},
-    admin: {type: mongoose.Types.ObjectId, ref: "Admin", required: true}, // admin = professor = instructor
+    // admin: {type: mongoose.Types.ObjectId, ref: "Admin", required: true}, // admin = professor = instructor
+    professor: {type: String, required: true}, // temporarily until Admin is designed later
     description: {type: String, required: true},
     seats: {type: Number, required: true}, // how many seats are available in this course
     students: [{type: mongoose.Types.ObjectId, ref: "User"}] // change "User" to "Student"

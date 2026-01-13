@@ -90,16 +90,22 @@ app.post('/api/v1/login', async (req, res) => {
 })
 
 // log in admin (no sign up admin endpoint - design sign up later)
-app.post('/api/v1/admin/login', (req, res) => {
+// app.post('/api/v1/admin/login', (req, res) => {
 
-})
+// })
 
 // STUDENT COURSE ENDPOINTS -----------
 
 // view all courses - public, excluding description
-app.get('/api/v1/courses', (req, res) => {
-    const courses = CourseModel.find().select("-description");
-    res.json({
+app.get('/api/v1/courses', async (req, res) => {
+    const courses = await CourseModel.find().select("-description");
+    
+    if(!courses) {
+        return res.status(200).json({
+            message: "No courses found"
+        })
+    }
+    return res.status(200).json({
         courses
     });
 })
@@ -117,7 +123,7 @@ app.get('/api/v1/courses/:course', async (req, res) => {
         return;
     }
 
-    res.json({
+    return res.json({
         course: course
     })
 })
@@ -169,7 +175,7 @@ app.post('/api/v1/courses/:course', authMiddleware, async (req, res) => {
             courses: [...user.courses, course]
         })
 
-        res.status(202).json({
+        return res.status(202).json({
             message: "Student successfully registered"
         })
     } catch(err){
@@ -230,7 +236,7 @@ app.delete('/api/v1/courses/:course', authMiddleware, async (req, res) => {
             },
         })
 
-        res.status(202).json({
+        return res.status(202).json({
             message: "Student successfully unregistered"
         })
     } catch(err){
@@ -250,19 +256,51 @@ app.delete('/api/v1/courses/:course', authMiddleware, async (req, res) => {
 // work on admin points later
 
 // admin: post a new course - admin authenticated
-// app.post('/api/v1/admin/courses', (req, res) => {
+// TEMPORARILY, let a student create a course, to test endpoints in frontend
+app.post('/api/v1/admin/courses', authMiddleware, async (req, res) => {
+    const courseName = req.body.courseName;
+    const courseId = req.body.courseId;
+    const professor = req.body.professor;
+    const description = req.body.description;
+    const seats = req.body.seats;
 
-// })
+    // add input validation for the properties using zod
+
+    try{
+        await CourseModel.create({
+            courseName,
+            courseId,
+            professor,
+            description,
+            seats
+        })
+
+        return res.status(201).json({
+            message: "Course created successfully"
+        })
+    } catch(err){
+        if(err instanceof Error){
+            return res.status(501).json({
+                message: "Error: \n" + err.message
+            })
+        } 
+        return res.status(501).json({
+            message: "Error in creating a course"
+        })
+    }
+})
 
 // // admin: update an existing course
-// app.put('/api/v1/admin/courses/:course', (req, res) => {
+// TEMPORARILY, let a student update a course, to test endpoints in frontend
+app.put('/api/v1/admin/courses/:course', (req, res) => {
 
-// })
+})
 
 // // admin: delete an existing course
-// app.delete('/api/v1/admin/courses/:course', (req, res) => {
+// TEMPORARILY, let a student delete a course, to test endpoints in frontend
+app.delete('/api/v1/admin/courses/:course', (req, res) => {
 
-// })
+})
 
 // start server
 app.listen(3000, () => {
