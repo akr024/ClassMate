@@ -182,14 +182,67 @@ app.post('/api/v1/courses/:course', authMiddleware, async (req, res) => {
             message: "Error in course registration"
         })
     }
-
-
-
 })
 
 // unregister from a course - authenticated
-app.delete('/api/v1/courses/:course', authMiddleware, (req, res) => {
+app.delete('/api/v1/courses/:course', authMiddleware, async (req, res) => {
+    const userId = req.userId;
+    const courseId = req.params.course as string;
+    // check if course has available seats
+    // add the student to the students list of the course
+    // add the course to the students list of registered courses
+    // verify if the student is enrolled in the course
 
+    const user = await UserModel.findOne({
+        _id: userId
+    })
+
+    if(!user){
+        return res.status(401).json({
+            message: "Error, user does not exist"
+        })
+    }
+
+    const course = await CourseModel.findOne({
+        courseId: courseId,
+        students: user._id // works because students: [ObjectId('213'), ObjectId('323)]
+    })
+
+    if(!course){
+        return res.status(401).json({
+            message: "Error, student not enrolled in course or course does not exist"
+        })
+    }
+
+    try{
+        await CourseModel.updateOne({
+            course
+        }, {
+            seats: course.seats + 1,
+            $pull: {students: user._id}
+        })
+
+        await UserModel.updateOne({
+            user
+        }, {
+            $pull: {
+                courses: course._id
+            },
+        })
+
+        res.status(202).json({
+            message: "Student successfully unregistered"
+        })
+    } catch(err){
+        if(err instanceof Error){
+            return res.status(500).json({
+                message: "Error: \n" + err.message
+            })
+        }
+        return res.status(500).json({
+            message: "Error in unregistrating course"
+        })
+    }
 })
 
 // ADMIN COURSE ENDPOINTS -----------
