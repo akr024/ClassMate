@@ -5,6 +5,7 @@ import bcrypt from 'bcrypt'
 import { authMiddleware } from './auth.js';
 import { UserModel, CourseModel } from './db.js';
 import 'dotenv/config'; // to load env variables
+import * as z from "zod"; 
 
 const PORT = process.env.PORT
 const JWT_SECRET = process.env.JWT_SECRET
@@ -29,8 +30,28 @@ app.post('/api/v1/signup', async (req, res) => {
     const password = req.body.password;
     const studentId = req.body.studentId;
 
+    const userDetails = {
+        email,
+        password,
+        studentId
+    }
+
     // validate email, password and studentId, using zod
+
+    const userValidation = z.object({
+        email: z.string().min(18).endsWith("@northeastern.edu").toLowerCase(), // min 18 characters including @northeastern.edu
+        password: z.string().min(5),
+        studentId: z.number()
+    })
     
+    const validationResult = userValidation.safeParse(userDetails);
+
+    if(!validationResult.success){
+        res.status(401).json({
+            message: "Error with input validaiton:\n" + validationResult.error
+        })
+    }
+
     const hashedPass = await bcrypt.hash(password, 10);
     
     try{
