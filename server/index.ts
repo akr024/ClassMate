@@ -6,8 +6,11 @@ import { authMiddleware } from './auth.js';
 import { UserModel, CourseModel } from './db.js';
 import 'dotenv/config'; // to load env variables
 import * as z from "zod"; 
+import mongoose from 'mongoose';
 
 const PORT = process.env.PORT
+const MONGO_DB = process.env.MONGO_DB
+if(!MONGO_DB) throw new Error("MONGO DB connective link missing")
 const JWT_SECRET = process.env.JWT_SECRET
 if (!JWT_SECRET) throw new Error("JWT_SECRET missing");
 
@@ -39,7 +42,7 @@ app.post('/api/v1/signup', async (req, res) => {
     // validate email, password and studentId, using zod
 
     const userValidation = z.object({
-        email: z.string().min(18).endsWith("@northeastern.edu").toLowerCase(), // min 18 characters including @northeastern.edu
+        email: z.string().min(18).endsWith("@northeastern.edu"), // min 18 characters including @northeastern.edu
         password: z.string().min(5),
         studentId: z.number()
     })
@@ -47,7 +50,7 @@ app.post('/api/v1/signup', async (req, res) => {
     const validationResult = userValidation.safeParse(userDetails);
 
     if(!validationResult.success){
-        res.status(401).json({
+        return res.status(401).json({
             message: "Error with input validaiton:\n" + validationResult.error
         })
     }
@@ -103,7 +106,7 @@ app.post('/api/v1/login', async (req, res) => {
             return;
         } else {
             return res.status(401).json({
-                message: "Invalid token"
+                message: "Incorrect password"
             })
         }
     } catch(err){
@@ -431,7 +434,12 @@ app.delete('/api/v1/admin/courses/:course', authMiddleware, async (req, res) => 
 })
 
 // start server
-app.listen(PORT, () => {
-    // mongoose.connect("") - connect to db, later
-    console.log("Server started on PORT 3000!")
+app.listen(PORT, async () => {
+    try{
+        await mongoose.connect(MONGO_DB);
+        console.log("Server started on PORT 3000!");
+    } catch (err){
+        console.log("Error with mongoose connecting to DB!")
+        return;
+    }
 })
