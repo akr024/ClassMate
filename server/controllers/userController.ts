@@ -65,6 +65,25 @@ async function userSignup (req: Request, res: Response) {
 async function userLogin(req: any, res: any) {
     const email = req.body.email;
     const password = req.body.password;
+    const userDetails = {
+        email,
+        password
+    }
+
+    // zod validation
+
+    const userValidation = z.object({
+        email: z.string().min(18).endsWith("@northeastern.edu"), // min 18 characters including @northeastern.edu
+        password: z.string().min(5),
+    })
+    
+    const validationResult = userValidation.safeParse(userDetails);
+
+    if(!validationResult.success){
+        return res.status(401).json({
+            message: "Error with input validaiton:\n" + validationResult.error
+        })
+    }
 
     try{
         const userFound = await UserModel.findOne({

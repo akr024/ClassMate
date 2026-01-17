@@ -13,7 +13,7 @@ if (!JWT_SECRET) throw new Error("JWT_SECRET missing");
 async function getAllCourses(req: Request, res: Response) {
     const courses = await CourseModel.find().select("-description");
     
-    if(!courses) {
+    if(courses.length === 0) {
         return res.status(200).json({
             message: "No courses found"
         })
@@ -27,6 +27,7 @@ async function getAllCourses(req: Request, res: Response) {
 
 async function getSpecificCourse(req: Request, res: Response) {
     const courseId = req.params.course as string;
+    // zod validation
     const course = await CourseModel.findOne({
         courseId: courseId
     })
@@ -48,6 +49,9 @@ async function registerInCourse(req: Request, res: Response) {
     // check if course has available seats
     // add the student to the students list of the course
     // add the course to the students list of registered courses
+
+    // zod validation
+
     const course = await CourseModel.findOne({
         courseId: courseId
     })
@@ -110,6 +114,8 @@ async function unregisterFromCourse(req: Request, res: Response) {
     // add the student to the students list of the course
     // add the course to the students list of registered courses
     // verify if the student is enrolled in the course
+
+    // zod validation
 
     const user = await UserModel.findOne({
         _id: userId

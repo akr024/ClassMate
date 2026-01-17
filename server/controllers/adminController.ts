@@ -15,6 +15,8 @@ async function addCourse(req: Request, res: Response) {
     const seats = req.body.seats;
     const userId = req.userId;
 
+    // zod validation
+
     if(!userId){
         return res.json({
             message: "UserId not provided"
@@ -54,6 +56,8 @@ async function editSpecificCourse(req: Request, res: Response) {
     const seats = req.body.seats;
     const courseId = req.params.course;
     const userId = req.userId;
+
+    // zod validation
 
     if(!userId){
         return res.status(400).json({
@@ -105,6 +109,8 @@ async function editSpecificCourse(req: Request, res: Response) {
 async function deleteSpecificCourse(req: Request, res: Response) {
     const courseId = req.params.course;
     const userId = req.userId;
+
+    // zod validation
     
     if(!userId){
         return res.status(401).json({
