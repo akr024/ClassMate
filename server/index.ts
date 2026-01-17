@@ -1,12 +1,14 @@
-import express from 'express';
+import express, {Router} from 'express';
 import jwt from 'jsonwebtoken';
 import cors from 'cors';
 import bcrypt from 'bcrypt'
 import { authMiddleware } from './auth.js';
-import { UserModel, CourseModel } from './db.js';
+import { CourseModel } from './models/courseModel.js';
+import { UserModel } from './models/userModel.js';
 import 'dotenv/config'; // to load env variables
 import * as z from "zod"; 
 import mongoose from 'mongoose';
+import apiRouter from './routes/api.js'
 
 const PORT = process.env.PORT
 const MONGO_DB = process.env.MONGO_DB
@@ -26,6 +28,8 @@ app.use(express.json()); // convert body to json
 // 4. start with the frontend
 
 // LOGIN/SIGNUP -----------
+
+app.use('/api/v1/', apiRouter)
 
 // sign up student - ideally authenticate student's existence before signing up
 app.post('/api/v1/signup', async (req, res) => {
@@ -128,8 +132,8 @@ app.post('/api/v1/login', async (req, res) => {
 
 // STUDENT COURSE ENDPOINTS -----------
 
-// view all courses - public, excluding description
-app.get('/api/v1/courses', async (req, res) => {
+// view all courses
+app.get('/api/v1/courses', authMiddleware, async (req, res) => {
     const courses = await CourseModel.find().select("-description");
     
     if(!courses) {
@@ -143,7 +147,7 @@ app.get('/api/v1/courses', async (req, res) => {
 })
 
 // view a specific course information - public
-app.get('/api/v1/courses/:course', async (req, res) => {
+app.get('/api/v1/courses/:course', authMiddleware, async (req, res) => {
     const courseId = req.params.course as string;
     const course = await CourseModel.findOne({
         courseId: courseId
