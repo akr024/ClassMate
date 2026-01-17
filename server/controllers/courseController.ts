@@ -1,21 +1,13 @@
-import express, {type Request, type Response} from 'express';
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt'
+import {type Request, type Response} from 'express';
 import { UserModel } from '../models/userModel.js';
 import 'dotenv/config'; // to load env variables
 import * as z from "zod"; 
 import { CourseModel } from '../models/courseModel.js';
-import { authMiddleware } from '../auth.js';
 
 const MONGO_DB = process.env.MONGO_DB
 if(!MONGO_DB) throw new Error("MONGO DB connective link missing")
 const JWT_SECRET = process.env.JWT_SECRET
 if (!JWT_SECRET) throw new Error("JWT_SECRET missing");
-
-const app = express();
-
-app.use(express.json()); // convert body to json
-
 
 // view all courses
 async function getAllCourses(req: Request, res: Response) {

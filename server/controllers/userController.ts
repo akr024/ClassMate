@@ -1,4 +1,4 @@
-import express, {type Request, type Response} from 'express';
+import {type Request, type Response} from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt'
 import { UserModel } from '../models/userModel.js';
@@ -9,10 +9,6 @@ const MONGO_DB = process.env.MONGO_DB
 if(!MONGO_DB) throw new Error("MONGO DB connective link missing")
 const JWT_SECRET = process.env.JWT_SECRET
 if (!JWT_SECRET) throw new Error("JWT_SECRET missing");
-
-const app = express();
-
-app.use(express.json()); // convert body to json
 
 // sign up student - ideally authenticate student's existence before signing up
 async function userSignup (req: Request, res: Response) {

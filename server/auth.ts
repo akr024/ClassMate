@@ -1,4 +1,4 @@
-import express, { type NextFunction, type Request, type Response } from 'express';
+import { type NextFunction, type Request, type Response } from 'express';
 import jwt, { type JwtPayload } from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET
@@ -22,7 +22,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction){
     }
 
     try{
-        const payload = jwt.verify(token, JWT_SECRET) as AuthPayload; // this returns the user id, though its not usable anywhere
+        const payload = jwt.verify(token, JWT_SECRET) as AuthPayload;
         req.userId = payload.id;
         res.json({ // optional, for testing purposes
             message: "successful log in",
