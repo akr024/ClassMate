@@ -33,11 +33,11 @@ async function getSpecificCourse(req: Request, res: Response) {
         courseId
     }
 
-    const userValidation = z.object({
+    const courseValidation = z.object({
         courseId: z.number()
     })
     
-    const validationResult = userValidation.safeParse(courseDetail);
+    const validationResult = courseValidation.safeParse(courseDetail);
 
     if(!validationResult.success){
         return res.status(401).json({
@@ -75,11 +75,11 @@ async function registerInCourse(req: Request, res: Response) {
 
     // validate email, password and studentId, using zod
 
-    const userValidation = z.object({
+    const courseValidation = z.object({
         courseId: z.number()
     })
     
-    const validationResult = userValidation.safeParse(courseDetails);
+    const validationResult = courseValidation.safeParse(courseDetails);
 
     if(!validationResult.success){
         return res.status(401).json({
@@ -158,11 +158,11 @@ async function unregisterFromCourse(req: Request, res: Response) {
 
     // validate email, password and studentId, using zod
 
-    const userValidation = z.object({
+    const courseValidation = z.object({
         courseId: z.number()
     })
     
-    const validationResult = userValidation.safeParse(courseDetails);
+    const validationResult = courseValidation.safeParse(courseDetails);
 
     if(!validationResult.success){
         return res.status(401).json({

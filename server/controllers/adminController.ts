@@ -13,7 +13,37 @@ async function addCourse(req: Request, res: Response) {
     const courseId = req.body.courseId;
     const description = req.body.description;
     const seats = req.body.seats;
-    const userId = req.userId;
+    const userId = req.userId; // no validation required as assigned from middleware
+
+    if(!userId){
+        return res.json({
+            message: "UserId not provided"
+        })
+    }
+
+    const courseDetails = {
+        courseName,
+        courseId,
+        description,
+        seats
+    }
+
+    // validate email, password and studentId, using zod
+
+    const adminValidation = z.object({
+        courseName: z.string().length(1), // make it more strict later
+        courseId: z.number(),
+        description: z.string().length(1),
+        seats: z.number().gt(0)
+    })
+    
+    const validationResult = adminValidation.safeParse(courseDetails);
+
+    if(!validationResult.success){
+        return res.status(401).json({
+            message: "Error with input validaiton:\n" + validationResult.error
+        })
+    }
 
     // zod validation
 
@@ -57,8 +87,6 @@ async function editSpecificCourse(req: Request, res: Response) {
     const courseId = req.params.course;
     const userId = req.userId;
 
-    // zod validation
-
     if(!userId){
         return res.status(400).json({
             message: "Error: User ID not provided"
@@ -68,6 +96,30 @@ async function editSpecificCourse(req: Request, res: Response) {
     if(!courseId){
         return res.status(401).json({
             message: "Course ID not provided"
+        })
+    }
+
+    const courseDetails = {
+        courseName,
+        courseId,
+        description,
+        seats
+    }
+
+    // validate email, password and studentId, using zod
+
+    const adminValidation = z.object({
+        courseName: z.string().length(1), // make it more strict later
+        courseId: z.number(),
+        description: z.string().length(1),
+        seats: z.number().gt(0)
+    })
+    
+    const validationResult = adminValidation.safeParse(courseDetails);
+
+    if(!validationResult.success){
+        return res.status(401).json({
+            message: "Error with input validaiton:\n" + validationResult.error
         })
     }
     
@@ -110,8 +162,6 @@ async function deleteSpecificCourse(req: Request, res: Response) {
     const courseId = req.params.course;
     const userId = req.userId;
 
-    // zod validation
-    
     if(!userId){
         return res.status(401).json({
             message: "User ID not provided"
@@ -123,7 +173,23 @@ async function deleteSpecificCourse(req: Request, res: Response) {
             message: "Course ID not provided"
         })
     }
+
+    const courseDetails = {
+        courseId
+    }
+
+    const adminValidation = z.object({
+        courseId: z.number()
+    })
     
+    const validationResult = adminValidation.safeParse(courseDetails);
+
+    if(!validationResult.success){
+        return res.status(401).json({
+            message: "Error with input validaiton:\n" + validationResult.error
+        })
+    }
+
     // improve specific error handling better later
 
     try{
