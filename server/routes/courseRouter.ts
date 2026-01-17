@@ -1,6 +1,6 @@
 import express from 'express'
 import courseController from '../controllers/courseController.js';
-import { authMiddleware } from '../auth.js';
+import { authMiddleware } from '../middleware/auth.js';
 
 const courseRouter = express.Router();
 
