@@ -27,8 +27,6 @@ app.use(express.json()); // convert body to json
 // 3. seperate all files into MVC-based structure
 // 4. start with the frontend
 
-// LOGIN/SIGNUP -----------
-
 app.use('/api/v1/', apiRouter)
 
 // ADMIN COURSE ENDPOINTS -----------

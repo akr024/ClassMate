@@ -4,6 +4,7 @@ import {z} from 'zod';
 import { UserModel } from '../models/userModel.js';
 import userRouter from './userRouter.js';
 import courseRouter from './courseRouter.js';
+import adminRouter from './adminRouter.js';
 
 const apiRouter = express.Router();
 
@@ -11,5 +12,6 @@ apiRouter.use('/users/', userRouter)
 
 apiRouter.use('/courses/', courseRouter)
 
+apiRouter.use('/admin/', adminRouter)
 
 export default apiRouter;

@@ -4,12 +4,12 @@ import { authMiddleware } from '../auth.js';
 
 const courseRouter = express.Router();
 
-courseRouter.get('/courses', courseController.getAllCourses)
+courseRouter.get('/', courseController.getAllCourses)
 
-courseRouter.get('/api/v1/courses/:course', authMiddleware, courseController.getSpecificCourse)
+courseRouter.get('/courses/:course', authMiddleware, courseController.getSpecificCourse)
 
-courseRouter.post('/api/v1/courses/:course', authMiddleware, courseController.registerInCourse)
+courseRouter.post('/courses/:course', authMiddleware, courseController.registerInCourse)
 
-courseRouter.delete('/api/v1/courses/:course', authMiddleware, courseController.unregisterFromCourse)
+courseRouter.delete('/courses/:course', authMiddleware, courseController.unregisterFromCourse)
 
 export default courseRouter;
