@@ -1,4 +1,4 @@
-import express from 'express';
+import express, {type Request, type Response} from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt'
 import { UserModel } from '../models/userModel.js';
@@ -15,7 +15,7 @@ const app = express();
 app.use(express.json()); // convert body to json
 
 // sign up student - ideally authenticate student's existence before signing up
-async function userSignup (req: any, res: any) {
+async function userSignup (req: Request, res: Response) {
     const email = req.body.email;
     const password = req.body.password;
     const studentId = req.body.studentId;
