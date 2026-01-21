@@ -14,7 +14,8 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction){
         });
     }
     
-    const token = req.headers['Authorization'];
+    const token = req.headers.authorization;
+    console.log(token)
     if(!token || typeof token !== "string"){
         return res.status(401).json({
             message: "Token not sent or incorrect token format."
@@ -24,10 +25,6 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction){
     try{
         const payload = jwt.verify(token, JWT_SECRET) as AuthPayload;
         req.userId = payload.id;
-        res.json({ // optional, for testing purposes
-            message: "successful log in",
-            payload: payload
-        })
         next();
     } catch (err){
         return res.status(401).json({

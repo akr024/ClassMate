@@ -31,9 +31,9 @@ async function addCourse(req: Request, res: Response) {
     // validate email, password and studentId, using zod
 
     const adminValidation = z.object({
-        courseName: z.string().length(1), // make it more strict later
-        courseId: z.number(),
-        description: z.string().length(1),
+        courseName: z.string().min(1), // make it more strict later
+        courseId: z.string(),
+        description: z.string().min(5),
         seats: z.number().gt(0)
     })
     
@@ -44,8 +44,6 @@ async function addCourse(req: Request, res: Response) {
             message: "Error with input validaiton:\n" + validationResult.error
         })
     }
-
-    // add input validation for the properties using zod
 
     try{
         await CourseModel.create({
@@ -101,9 +99,9 @@ async function editSpecificCourse(req: Request, res: Response) {
     // validate email, password and studentId, using zod
 
     const adminValidation = z.object({
-        courseName: z.string().length(1), // make it more strict later
-        courseId: z.number(),
-        description: z.string().length(1),
+        courseName: z.string().min(1), // make it more strict later
+        courseId: z.string(),
+        description: z.string().min(1),
         seats: z.number().gt(0)
     })
     

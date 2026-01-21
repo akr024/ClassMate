@@ -6,10 +6,10 @@ import adminRouter from './adminRouter.js';
 const apiRouter = express.Router();
 
 // all user endpoints
-apiRouter.use('/users/', userRouter)
+apiRouter.use('/user/', userRouter)
 
 // all course endpoints
-apiRouter.use('/courses/', courseRouter)
+apiRouter.use('/course/', courseRouter)
 
 // all admin endpoints - to be worked upon later
 apiRouter.use('/admin/', adminRouter)

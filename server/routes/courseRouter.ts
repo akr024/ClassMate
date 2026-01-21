@@ -8,12 +8,12 @@ const courseRouter = express.Router();
 courseRouter.get('/', courseController.getAllCourses)
 
 // to get a specific course (including description)
-courseRouter.get('/courses/:course', authMiddleware, courseController.getSpecificCourse)
+courseRouter.get('/:course', authMiddleware, courseController.getSpecificCourse)
 
 // to register in a course
-courseRouter.post('/courses/:course', authMiddleware, courseController.registerInCourse)
+courseRouter.post('/:course', authMiddleware, courseController.registerInCourse)
 
 // to unregister from a specific course
-courseRouter.delete('/courses/:course', authMiddleware, courseController.unregisterFromCourse)
+courseRouter.delete('/:course', authMiddleware, courseController.unregisterFromCourse)
 
 export default courseRouter;
