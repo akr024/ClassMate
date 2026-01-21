@@ -11,6 +11,7 @@ const JWT_SECRET = process.env.JWT_SECRET
 if (!JWT_SECRET) throw new Error("JWT_SECRET missing");
 
 // sign up student - ideally authenticate student's existence before signing up
+// tested using postman - works
 async function userSignup (req: Request, res: Response) {
     const email = req.body.email;
     const password = req.body.password;
