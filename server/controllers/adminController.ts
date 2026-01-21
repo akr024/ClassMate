@@ -8,6 +8,7 @@ if(!MONGO_DB) throw new Error("MONGO DB connective link missing")
 const JWT_SECRET = process.env.JWT_SECRET
 if (!JWT_SECRET) throw new Error("JWT_SECRET missing");
 
+// Tested with postman
 async function addCourse(req: Request, res: Response) {
     const courseName = req.body.courseName;
     const courseId = req.body.courseId;
@@ -69,6 +70,7 @@ async function addCourse(req: Request, res: Response) {
     }
 }
 
+// Tested with postman
 async function editSpecificCourse(req: Request, res: Response) {
     const courseName = req.body.courseName;
     // cannot change a courseId
@@ -114,24 +116,35 @@ async function editSpecificCourse(req: Request, res: Response) {
     }
     
     try{
-        await CourseModel.findOne({
+        const course = await CourseModel.findOne({
             courseId: courseId,
             admin: userId
         })
+        if(!course){
+            return res.status(400).json({
+                message: "Error, course not found or user not admin"
+            })
+        }
     } catch (err){
-        return res.status(400).json({
-            message: "Error, course not found or user not admin"
+        return res.status(501).json({
+            message: "Server error"
         })
     }
     
     try {
-        await CourseModel.updateOne({
+        const course = await CourseModel.updateOne({
             courseId: courseId
         }, {
             courseName: courseName,
             description: description,
             seats: seats
         })
+
+        if(!course){
+            return res.status(400).json({
+                message: "Error, course could not be updated"
+            })
+        }
 
         res.status(200).json({
             message: "Course successfully updated"
