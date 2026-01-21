@@ -63,6 +63,7 @@ async function userSignup (req: Request, res: Response) {
 }
 
 // log in student
+// tested with postman
 async function userLogin(req: any, res: any) {
     const email = req.body.email;
     const password = req.body.password;
@@ -82,7 +83,7 @@ async function userLogin(req: any, res: any) {
 
     if(!validationResult.success){
         return res.status(401).json({
-            message: "Error with input validaiton:\n" + validationResult.error
+            message: "Error with input validaiton: " + validationResult.error.message
         })
     }
 
