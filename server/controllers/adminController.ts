@@ -161,6 +161,7 @@ async function editSpecificCourse(req: Request, res: Response) {
     }
 }
 
+// tested with postman
 async function deleteSpecificCourse(req: Request, res: Response) {
     const courseId = req.params.course;
     const userId = req.userId;
@@ -182,7 +183,7 @@ async function deleteSpecificCourse(req: Request, res: Response) {
     }
 
     const adminValidation = z.object({
-        courseId: z.number()
+        courseId: z.string()
     })
     
     const validationResult = adminValidation.safeParse(courseDetails);
@@ -201,11 +202,15 @@ async function deleteSpecificCourse(req: Request, res: Response) {
             admin: userId
         })
         
-        if (courseValid){
-            await CourseModel.deleteOne({
-                courseId: courseId
+        if (!courseValid){
+            return res.status(400).json({
+                message: "Course not found or user not admin"
             })
         }
+
+        await CourseModel.deleteOne({
+            courseId: courseId
+        })
 
         return res.status(200).json({
             message: "Course deleted successfully"
