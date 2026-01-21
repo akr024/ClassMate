@@ -45,14 +45,6 @@ async function addCourse(req: Request, res: Response) {
         })
     }
 
-    // zod validation
-
-    if(!userId){
-        return res.json({
-            message: "UserId not provided"
-        })
-    }
-
     // add input validation for the properties using zod
 
     try{
