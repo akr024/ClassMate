@@ -3,6 +3,7 @@ import { UserModel } from '../models/userModel.js';
 import 'dotenv/config'; // to load env variables
 import * as z from "zod"; 
 import { CourseModel } from '../models/courseModel.js';
+import { is } from 'zod/locales';
 
 const MONGO_DB = process.env.MONGO_DB
 if(!MONGO_DB) throw new Error("MONGO DB connective link missing")
@@ -27,17 +28,12 @@ async function getAllCourses(req: Request, res: Response) {
 
 async function getSpecificCourse(req: Request, res: Response) {
     const courseId = req.params.course as string;
-    // zod validation
-
-    const courseDetail = {
-        courseId
-    }
 
     const courseValidation = z.object({
         courseId: z.number()
     })
     
-    const validationResult = courseValidation.safeParse(courseDetail);
+    const validationResult = courseValidation.safeParse({courseId});
 
     if(!validationResult.success){
         return res.status(401).json({
@@ -48,15 +44,16 @@ async function getSpecificCourse(req: Request, res: Response) {
     const course = await CourseModel.findOne({
         courseId: courseId
     })
+
     if(!course){
-        res.json({
+        res.status(401).json({
             message: "Error, the course does not exist"
         })
         return;
     }
 
-    return res.json({
-        course: course
+    return res.status(200).json({
+        course
     })
 }
 
@@ -67,19 +64,12 @@ async function registerInCourse(req: Request, res: Response) {
     // add the student to the students list of the course
     // add the course to the students list of registered courses
 
-    // zod validation
-
-    const courseDetails = {
-        courseId
-    }
-
-    // validate email, password and studentId, using zod
 
     const courseValidation = z.object({
         courseId: z.number()
     })
     
-    const validationResult = courseValidation.safeParse(courseDetails);
+    const validationResult = courseValidation.safeParse({courseId});
 
     if(!validationResult.success){
         return res.status(401).json({
@@ -97,12 +87,6 @@ async function registerInCourse(req: Request, res: Response) {
         })
     }
 
-    if(course.seats < 1){ // no seat available
-        return res.status(409).json({
-            message: "No seat left unfortunately"
-        })
-    }
-
     const user = await UserModel.findOne({
         _id: userId
     })
@@ -110,6 +94,20 @@ async function registerInCourse(req: Request, res: Response) {
     if(!user){
         return res.status(401).json({
             message: "Error, user does not exist"
+        })
+    }
+
+    if(course.seats < 1){ // no seat available
+        return res.status(409).json({
+            message: "No seat left unfortunately"
+        })
+    }
+
+    // check if the user is already a student
+
+    if(course.students.includes(user._id)){
+        return res.status(401).json({
+            message: "Error, user already registered for the course"
         })
     }
 
