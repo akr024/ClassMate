@@ -30,7 +30,7 @@ async function getSpecificCourse(req: Request, res: Response) {
     const courseId = req.params.course as string;
 
     const courseValidation = z.object({
-        courseId: z.number()
+        courseId: z.string()
     })
     
     const validationResult = courseValidation.safeParse({courseId});
