@@ -25,7 +25,7 @@ async function getAllCourses(req: Request, res: Response) {
 }
 
 // view a specific course information - public
-
+// POSTMAN TESTED
 async function getSpecificCourse(req: Request, res: Response) {
     const courseId = req.params.course as string;
 
@@ -57,6 +57,7 @@ async function getSpecificCourse(req: Request, res: Response) {
     })
 }
 
+// POSTMAN TESTED
 async function registerInCourse(req: Request, res: Response) {
     const userId = req.userId;
     const courseId = req.params.course as string;
@@ -64,9 +65,8 @@ async function registerInCourse(req: Request, res: Response) {
     // add the student to the students list of the course
     // add the course to the students list of registered courses
 
-
     const courseValidation = z.object({
-        courseId: z.number()
+        courseId: z.string()
     })
     
     const validationResult = courseValidation.safeParse({courseId});
@@ -113,14 +113,14 @@ async function registerInCourse(req: Request, res: Response) {
 
     try{
         await CourseModel.updateOne({
-            course
+            _id: course._id
         }, {
             seats: course.seats - 1,
             students: [...course.students, user]
         })
 
         await UserModel.updateOne({
-            user
+            _id: user._id
         }, {
             courses: [...user.courses, course]
         })
@@ -149,7 +149,7 @@ async function unregisterFromCourse(req: Request, res: Response) {
     // verify if the student is enrolled in the course
 
     const courseValidation = z.object({
-        courseId: z.number()
+        courseId: z.string()
     })
     
     const validationResult = courseValidation.safeParse({courseId});
@@ -183,14 +183,14 @@ async function unregisterFromCourse(req: Request, res: Response) {
 
     try{
         await CourseModel.updateOne({
-            course
+            _id: course._id
         }, {
             seats: course.seats + 1,
             $pull: {students: user._id}
         })
 
         await UserModel.updateOne({
-            user
+            _id: user._id
         }, {
             $pull: {
                 courses: course._id
