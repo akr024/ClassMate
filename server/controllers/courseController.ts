@@ -3,7 +3,6 @@ import { UserModel } from '../models/userModel.js';
 import 'dotenv/config'; // to load env variables
 import * as z from "zod"; 
 import { CourseModel } from '../models/courseModel.js';
-import { is } from 'zod/locales';
 
 const MONGO_DB = process.env.MONGO_DB
 if(!MONGO_DB) throw new Error("MONGO DB connective link missing")
@@ -11,6 +10,7 @@ const JWT_SECRET = process.env.JWT_SECRET
 if (!JWT_SECRET) throw new Error("JWT_SECRET missing");
 
 // view all courses
+// POSTMAN TESTED
 async function getAllCourses(req: Request, res: Response) {
     const courses = await CourseModel.find().select("-description");
 
@@ -148,19 +148,11 @@ async function unregisterFromCourse(req: Request, res: Response) {
     // add the course to the students list of registered courses
     // verify if the student is enrolled in the course
 
-    // zod validation
-
-    const courseDetails = {
-        courseId
-    }
-
-    // validate email, password and studentId, using zod
-
     const courseValidation = z.object({
         courseId: z.number()
     })
     
-    const validationResult = courseValidation.safeParse(courseDetails);
+    const validationResult = courseValidation.safeParse({courseId});
 
     if(!validationResult.success){
         return res.status(401).json({
