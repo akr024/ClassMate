@@ -1,3 +1,5 @@
+// BASE BACKEND COMPLETE
+
 import express from 'express'
 import userRouter from './userRouter.js';
 import courseRouter from './courseRouter.js';
