@@ -61,83 +61,60 @@ async function getSpecificCourse(req: Request, res: Response) {
 async function registerInCourse(req: Request, res: Response) {
     const userId = req.userId;
     const courseId = req.params.course as string;
-    // check if course has available seats
-    // add the student to the students list of the course
-    // add the course to the students list of registered courses
 
     const courseValidation = z.object({
         courseId: z.string()
-    })
+    });
     
-    const validationResult = courseValidation.safeParse({courseId});
-
-    if(!validationResult.success){
+    const validationResult = courseValidation.safeParse({ courseId });
+    if (!validationResult.success) {
         return res.status(401).json({
-            message: "Error with input validaiton:\n" + validationResult.error
-        })
+            message: "Error with input validation:\n" + validationResult.error
+        });
     }
 
-    const course = await CourseModel.findOne({
-        courseId: courseId
-    })
-
-    if(!course){
-        return res.status(401).json({
-            message: "Error, course does not exist"
-        })
-    }
-
-    const user = await UserModel.findOne({
-        _id: userId
-    })
-
-    if(!user){
+    const user = await UserModel.findById(userId);
+    if (!user) {
         return res.status(401).json({
             message: "Error, user does not exist"
-        })
+        });
     }
 
-    if(course.seats < 1){ // no seat available
-        return res.status(409).json({
-            message: "No seat left unfortunately"
-        })
-    }
+    const course = await CourseModel.findOneAndUpdate(
+        { 
+            courseId,
+            seats: { $gt: 0 }, // concurrency control through atomicity
+            students: { $ne: user._id }
+        },
+        { 
+            $inc: { seats: -1 }, 
+            $addToSet: { students: user._id }
+        },
+        { new: true }
+    );
 
-    // check if the user is already a student
-
-    if(course.students.includes(user._id)){
-        return res.status(401).json({
-            message: "Error, user already registered for the course"
-        })
-    }
-
-    try{
-        await CourseModel.updateOne({
-            _id: course._id
-        }, {
-            seats: course.seats - 1,
-            students: [...course.students, user]
-        })
-
-        await UserModel.updateOne({
-            _id: user._id
-        }, {
-            courses: [...user.courses, course]
-        })
-
-        return res.status(202).json({
-            message: "Student successfully registered"
-        })
-    } catch(err){
-        if(err instanceof Error){
-            return res.status(500).json({
-                message: "Error: \n" + err.message
-            })
+    if (!course) {
+        const existingCourse = await CourseModel.findOne({ courseId });
+        if (!existingCourse) {
+            return res.status(401).json({ message: "Course does not exist" });
         }
-        return res.status(500).json({
-            message: "Error in course registration"
-        })
+        if (existingCourse.students.includes(user._id)) {
+            return res.status(409).json({ message: "User already registered for the course" });
+        }
+        if (existingCourse.seats < 1) {
+            return res.status(409).json({ message: "No seat left unfortunately" });
+        }
+        return res.status(500).json({ message: "Failed to register due to unknown reason" });
     }
+
+    await UserModel.updateOne(
+        { _id: user._id },
+        { $addToSet: { courses: course._id } }
+    );
+
+    return res.status(202).json({
+        message: "Student successfully registered"
+    });
 }
 
 async function unregisterFromCourse(req: Request, res: Response) {
