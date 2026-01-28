@@ -2,8 +2,6 @@
 
 **Why?** Building to solve the common issues faced by students in my university while registering for courses due to a substandard workflow - building for students, built by a student.
 
-Detailed description below!
-
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ## Overview
