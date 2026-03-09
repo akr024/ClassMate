@@ -54,6 +54,6 @@ export const up = (pgm) => {
 
 
 export const down = (pgm) => {
+    pgm.dropTable("sections") // order matters because if you delete courses first, postgres will throw an error
     pgm.dropTable("courses")
-    pgm.dropTable("sections")
 };
