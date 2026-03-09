@@ -5,7 +5,7 @@ const fastify = Fastify({
     logger: true
 })
 
-const start = async () => {
+async function start() {
     try {
         await fastify.listen({
             port: config.port,
