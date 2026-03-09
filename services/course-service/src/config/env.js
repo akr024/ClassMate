@@ -8,7 +8,7 @@ export const config = {
     postgres: {
         host: process.env.POSTGRES_HOST || "localhost",
         port: process.env.POSTGRES_PORT || 5432,
-        user: process.env.POSTGRES_USER || "postgres",
+        user: process.env.POSTGRES_USER || "postgresuser",
         password: process.env.POST_PASSWORD || "postgres",
         database: process.env.POSTGRES || "course_service_db"
     }
