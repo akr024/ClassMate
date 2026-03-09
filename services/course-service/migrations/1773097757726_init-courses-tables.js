@@ -53,4 +53,7 @@ export const up = (pgm) => {
 };
 
 
-export const down = (pgm) => {};
+export const down = (pgm) => {
+    pgm.dropTable("courses")
+    pgm.dropTable("sections")
+};
