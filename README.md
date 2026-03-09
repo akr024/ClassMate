@@ -1,13 +1,13 @@
 # ClassMate - Course Registration Application
 
+## NOTE
+Redesigning from scratch, with a focus on backend-specific distributed registration system, equipped to handle immense load and handle concurrent requests for enrollments.
+
 **Why?** Building to solve the common issues faced by students in my university while registering for courses due to a substandard workflow - building for students, built by a student.
 
 **Note:** This project is being actively developed, and is intended to be a potential replacement/extension to my university's existing course registration system by May 2026.
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-## NOTE
-Redesigning from scratch, with a focus on backend-specific distributed registration system, equipped to handle immense load and handle concurrent requests for enrollments.
 
 ## Overview
 
