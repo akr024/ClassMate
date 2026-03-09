@@ -26,6 +26,30 @@ export const up = (pgm) => {
         }
     })
 
+    pgm.createTable("sections", {
+        id: {
+            type: "uuid",
+            primaryKey: true
+        },
+        course_id: {
+            type: "uuid",
+            notNull: true,
+            references: "courses",
+            onDelete: "cascade"
+        },
+        section_number: {
+            type: "integer",
+            notNull: true
+        },
+        capacity: {
+            type: "integer",
+            notNull: true
+        },
+        created_at: {
+            type: "timestamp",
+            default: pgm.func("current_timestamp")
+        }
+    })
 };
 
 
