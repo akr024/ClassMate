@@ -3,7 +3,7 @@ import { config } from "../config/env.js"
 
 const { Pool } = pg
 
-const pool = new Pool({
+export const pool = new Pool({
     host: config.postgres.host,
     port: config.postgres.port,
     user: config.postgres.user,
