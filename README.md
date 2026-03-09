@@ -6,6 +6,9 @@
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+## NOTE
+Redesigning from scratch, with a focus on backend-specific distributed registration system, equipped to handle immense load and handle concurrent requests for enrollments.
+
 ## Overview
 
 This repository contains the **full-stack course registration system**, including both the **frontend (Next.js)** and a **TypeScript-based backend (Node.js + Express)**. The system is being designed with clear separation of concerns, strong typing, and real-world authentication and data validation practices.
