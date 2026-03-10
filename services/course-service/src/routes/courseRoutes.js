@@ -1,4 +1,4 @@
-import { getCourses, getSections, createCourse, createSection } from "../controllers/courseController";
+import { getCourses, getSections, createCourse, createSection } from "../controllers/courseController.js";
 
 export async function courseRoutes(fastify){
     fastify.post("/courses", createCourse)

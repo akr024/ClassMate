@@ -8,7 +8,7 @@ export const up = (pgm) => {
             type: "uuid",
             primaryKey: true
         },
-        courseCode: {
+        course_code: {
             type: "varchar(20)",
             notNull: true,
             unique: true
