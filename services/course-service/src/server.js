@@ -1,10 +1,13 @@
 import Fastify from "fastify"
 import { config } from "./config/env.js"
 import { pool } from "./db/postgres.js"
+import { courseRoutes } from "../routes/courseRoutes.js"
 
 const fastify = Fastify({
     logger: true
 })
+
+fastify.register(courseRoutes)
 
 async function start() {
     try {
