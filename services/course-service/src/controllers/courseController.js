@@ -1,5 +1,6 @@
 import { pool } from "../db/postgres.js"
 import { v4 as uuidv4 } from "uuid"
+import { publishEvent } from "../events/publisher.js";
 
 export async function createCourse(req, res){
     const { course_code, name, description } = req.body;
@@ -27,6 +28,13 @@ export async function createSection(req, res){
         RETURNING *
         `, [id, course_id, section_number, capacity] // parameterized sql, avoids sql injections
     )
+
+    publishEvent("section.created", {
+        section_id: id,
+        course_id,
+        section_number,
+        capacity
+    })
 
     return res.send(result.rows[0])
 }
