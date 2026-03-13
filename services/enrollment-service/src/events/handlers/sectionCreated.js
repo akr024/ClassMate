@@ -1,4 +1,4 @@
-import { pool } from "../../db/postgres"
+import { pool } from "../../db/postgres.js"
 
 export async function handleSectionCreated(event){
     console.log("Received section.created event!", event)

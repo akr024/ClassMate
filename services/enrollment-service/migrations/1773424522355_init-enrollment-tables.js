@@ -8,9 +8,7 @@ export const up = (pgm) => {
         },
         course_id: {
             type: "uuid",
-            notNull: true,
-            references: "courses",
-            onDelete: "cascade"
+            notNull: true
         },
         section_number: {
             type: "integer",
@@ -20,7 +18,7 @@ export const up = (pgm) => {
             type: "integer",
             notNull: true
         },
-        seats_remaning: {
+        seats_remaining: {
             type: "integer",
             notNull: true
         },
