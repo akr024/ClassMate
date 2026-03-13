@@ -1,10 +1,12 @@
 import { redisClient } from "../config/redis.js"
+import { routeEvent } from "./router.js"
 
-export async function startSubscriber(handler){
+export async function startSubscriber(){
     const subscriber = redisClient.duplicate()
     await subscriber.connect()
-    await subscriber.subscribe("section.created", (message) => {
-        const data = JSON.parse(message)
-        handler(data)
+    
+    await subscriber.subscribe("section.created", async (message) => {
+        const event = JSON.parse(message)
+        await routeEvent("section.created", event)
     })
 }

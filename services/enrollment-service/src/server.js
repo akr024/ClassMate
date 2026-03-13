@@ -16,9 +16,7 @@ const start = async () => {
         await redisClient.connect()
         console.log("Redis pub/sub connected")
 
-        await startSubscriber((message) => {
-            console.log("Received section.created event!", message)
-        })
+        await startSubscriber()
 
         await fastify.listen({
             port: config.port,
