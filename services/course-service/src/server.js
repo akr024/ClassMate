@@ -2,6 +2,7 @@ import Fastify from "fastify"
 import { config } from "./config/env.js"
 import { pool } from "./db/postgres.js"
 import { courseRoutes } from "./routes/courseRoutes.js"
+import { redisClient } from "./config/redis.js"
 
 const fastify = Fastify({
     logger: true
@@ -12,6 +13,9 @@ fastify.register(courseRoutes)
 async function start() {
     try {
         await pool.query("SELECT 1")
+        await redisClient.connect()
+
+        console.log("Redis connected")
 
         await fastify.listen({
             port: config.port,
