@@ -3,10 +3,13 @@ import { config } from "./config/env.js"
 import { pool } from "./db/postgres.js"
 import { redisClient } from "./config/redis.js"
 import { startSubscriber } from "./events/subscriber.js"
+import { enrollmentRoutes } from "./routes/enrollmentRoutes.js"
 
 const fastify = Fastify({
     logger: true
 })
+
+fastify.register(enrollmentRoutes)
 
 const start = async () => {
     try{
