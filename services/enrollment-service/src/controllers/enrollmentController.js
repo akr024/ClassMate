@@ -3,12 +3,12 @@ import { v4 as uuidv4 } from "uuid"
 
 export async function enrollStudent(req, res){
     const { studentId, sectionId } = req.body;
-    const client = pool.connect()
+    const client = await pool.connect()
 
     try {
         await client.query("BEGIN")
 
-        const sectionResult = client.query(
+        const sectionResult = await client.query(
             `
             SELECT seats_remaining
             FROM sections
@@ -56,7 +56,7 @@ export async function enrollStudent(req, res){
             error: err.message
         })
     } finally {
-        await client.release()
+        client.release()
     }
 
 }
