@@ -104,7 +104,7 @@ export async function deEnrollStudent(req, res){
         )
 
         await client.query("COMMIT")
-
+        
         publishEvent("student.dropped", {
             studentId,
             sectionId
