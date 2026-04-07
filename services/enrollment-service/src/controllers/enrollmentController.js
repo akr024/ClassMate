@@ -1,6 +1,7 @@
 import { pool } from "../db/postgres.js"
 import { v4 as uuidv4 } from "uuid"
 import { publishEvent } from "../events/publisher.js";
+import { waitlistQueue } from "../queue/waitlistQueue.js";
 
 export async function enrollStudent(req, res){
     const { studentId, sectionId } = req.body;
@@ -25,7 +26,16 @@ export async function enrollStudent(req, res){
         const seatsRemaining = sectionResult.rows[0].seats_remaining
 
         if(seatsRemaining <= 0){
-            throw new Error("No seats remaining")
+            await waitlistQueue.add("waitlist-enroll", {
+                studentId,
+                sectionId
+            })
+
+            await client.query("COMMIT")
+
+            return res.send({
+                waitlisted: true
+            })
         }
 
         const enrollmentId = uuidv4()
