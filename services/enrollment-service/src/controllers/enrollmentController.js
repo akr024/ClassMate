@@ -153,7 +153,7 @@ export async function deEnrollStudent(req, res) {
         await client.query("COMMIT");
 
         await publishEvent("student.dropped", { studentId, sectionId });
-        await waitlistQueue.add("process-waitlist", { sectionId });
+        await waitlistQueue.add("promote-next", { sectionId });
 
         return res.send({ success: true });
 
