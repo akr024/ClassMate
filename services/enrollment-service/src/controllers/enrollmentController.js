@@ -70,6 +70,7 @@ export async function enrollStudent(req, res){
             });
         }
 
+        //if seats are available:
         const enrollmentId = uuidv4()
 
         await client.query(
@@ -96,7 +97,8 @@ export async function enrollStudent(req, res){
         })
 
         return res.send({
-            success: true
+            success: true,
+            enrollmentId
         })
 
     } catch (err){
