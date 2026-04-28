@@ -26,7 +26,7 @@ export async function enrollStudent(req, res){
         const seatsRemaining = sectionResult.rows[0].seats_remaining
 
         if(seatsRemaining <= 0){
-            await waitlistQueue.add("waitlist-enroll", {
+            await waitlistQueue.add("waitlist-job", {
                 studentId,
                 sectionId
             })
@@ -119,6 +119,12 @@ export async function deEnrollStudent(req, res){
             studentId,
             sectionId
         })
+
+        await waitlistQueue.add("process-waitlist", {
+            sectionId
+        });
+
+
 
     } catch (err){
         await client.query("ROLLBACK")

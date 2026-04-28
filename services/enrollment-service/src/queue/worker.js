@@ -1,67 +1,109 @@
 import { Worker } from "bullmq";
-import { pool } from "../db/postgres";
-import { v4 as uuidv4 } from "uuid"
+import { pool } from "../db/postgres.js";
+import { v4 as uuidv4 } from "uuid";
 
-const worker = new Worker(
-    "waitlist",
-    async (job) => {
-        const { studentId, sectionId } = job.data
-        const client = pool.connect()
+console.log("🚀 Waitlist Worker starting...");
 
-        try {
-            await client.query("BEGIN")
+export const worker = new Worker(
+  "waitlist",
+  async (job) => {
+    console.log("Job received:", job.id, job.data);
 
-            const result = await client.query(`
-                SELECT seats_remaining
-                FROM sections
-                WHERE id = $1
-                FOR UPDATE
-                `,
-                [sectionId]
-            )
+    const { sectionId } = job.data;
 
-            if (result.rows.length === 0){
-                throw new Error ("Section not found")
-            }
+    const client = await pool.connect();
 
-            const seatsRemaining = result.rows[0].seats_remaining
+    try {
+      await client.query("BEGIN");
 
-            if(seatsRemaining <= 0){
-                await client.query("ROLLBACK")
-                return
-            }
+      // 1. Lock section
+      const sectionRes = await client.query(
+        `
+        SELECT seats_remaining
+        FROM sections
+        WHERE id = $1
+        FOR UPDATE
+        `,
+        [sectionId]
+      );
 
-            const enrollmentId = uuidv4()
+      if (sectionRes.rows.length === 0) {
+        throw new Error("Section not found");
+      }
 
-            await client.query(
-                `
-                INSERT INTO enrollments (id, student_id, section_id)
-                VALUES ($1, $2, $3)
-                `, [enrollmentId, studentId, sectionId]
-            )
+      const seats = sectionRes.rows[0].seats_remaining;
 
-            await client.query(
-                `
-                UPDATE sections
-                SET seats_remaining = seats_remaining - 1
-                WHERE id = $1
-                `, [sectionId]
-            )
+      if (seats <= 0) {
+        await client.query("ROLLBACK");
+        return;
+      }
 
-            await client.query("COMMIT")
+      // 2. Get earliest waitlisted student
+      const waitRes = await client.query(
+        `
+        SELECT student_id
+        FROM waitlist
+        WHERE section_id = $1
+        ORDER BY created_at ASC
+        LIMIT 1
+        FOR UPDATE SKIP LOCKED
+        `,
+        [sectionId]
+      );
 
-            console.log("Waitlisted student", studentId, " enrolled")
-        } catch (err){
-            await client.query("ROLLBACK")
-            console.error(err)
-        } finally {
-            await client.release()
-        }
-    },
-    {
-        connection: {
-            host: "127.0.0.1",
-            port: 6379
-        }
+      if (waitRes.rows.length === 0) {
+        await client.query("ROLLBACK");
+        return;
+      }
+
+      const studentId = waitRes.rows[0].student_id;
+
+      // 3. Enroll student
+      const enrollmentId = uuidv4();
+
+      await client.query(
+        `
+        INSERT INTO enrollments (id, student_id, section_id)
+        VALUES ($1, $2, $3)
+        `,
+        [enrollmentId, studentId, sectionId]
+      );
+
+      // 4. Remove from waitlist
+      await client.query(
+        `
+        DELETE FROM waitlist
+        WHERE student_id = $1 AND section_id = $2
+        `,
+        [studentId, sectionId]
+      );
+
+      // 5. Decrement seat
+      await client.query(
+        `
+        UPDATE sections
+        SET seats_remaining = seats_remaining - 1
+        WHERE id = $1
+        `,
+        [sectionId]
+      );
+
+      await client.query("COMMIT");
+
+      console.log("Waitlisted student enrolled:", studentId);
+
+    } catch (err) {
+      await client.query("ROLLBACK");
+      console.error("Worker transaction error:", err);
+
+    } finally {
+      client.release();
     }
-)
+  },
+  {
+    connection: {
+      host: "127.0.0.1",
+      port: 6379,
+    },
+  }
+);
