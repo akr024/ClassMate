@@ -77,13 +77,12 @@ export async function enrollStudent(req, res){
     }
 }
 
-export async function deEnrollStudent(req, res){
-    const { studentId, sectionId } = req.body
-    const client = await pool.connect()
+export async function deEnrollStudent(req, res) {
+    const { studentId, sectionId } = req.body;
+    const client = await pool.connect();
 
-    try{
-
-        await client.query("BEGIN")
+    try {
+        await client.query("BEGIN");
 
         const enrollmentResult = await client.query(
             `
@@ -91,47 +90,43 @@ export async function deEnrollStudent(req, res){
             FROM enrollments
             WHERE student_id = $1 AND section_id = $2
             FOR UPDATE
-            `, [studentId, sectionId]
-        )
+            `,
+            [studentId, sectionId]
+        );
 
-        if(enrollmentResult.rows.length == 0){
-            throw new Error("Student enrollment not found")
+        if (enrollmentResult.rows.length === 0) {
+            await client.query("ROLLBACK");
+            return res.status(404).send({ error: "Student enrollment not found" });
         }
-        
+
         await client.query(
             `
             DELETE FROM enrollments
             WHERE student_id = $1 AND section_id = $2
-            `, [studentId, sectionId]
-        )
+            `,
+            [studentId, sectionId]
+        );
 
         await client.query(
             `
             UPDATE sections
             SET seats_remaining = seats_remaining + 1
             WHERE id = $1
-            `, [sectionId]
-        )
+            `,
+            [sectionId]
+        );
 
-        await client.query("COMMIT")
-        
-        publishEvent("student.dropped", {
-            studentId,
-            sectionId
-        })
+        await client.query("COMMIT");
 
-        await waitlistQueue.add("process-waitlist", {
-            sectionId
-        });
+        await publishEvent("student.dropped", { studentId, sectionId });
+        await waitlistQueue.add("process-waitlist", { sectionId });
 
+        return res.send({ success: true });
 
-
-    } catch (err){
-        await client.query("ROLLBACK")
-        return res.status(400).send({
-            error: err.message
-        })
+    } catch (err) {
+        await client.query("ROLLBACK");
+        return res.status(400).send({ error: err.message });
     } finally {
-        client.release()
+        client.release();
     }
 }
