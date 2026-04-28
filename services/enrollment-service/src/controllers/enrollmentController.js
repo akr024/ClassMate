@@ -20,7 +20,8 @@ export async function enrollStudent(req, res){
         )
 
         if(sectionResult.rows.length == 0){
-            throw new Error("Section not found")
+            await client.query("ROLLBACK");
+            return res.status(404).send({ error: "Section not found" });
         }
 
         const seatsRemaining = sectionResult.rows[0].seats_remaining
