@@ -26,17 +26,48 @@ export async function enrollStudent(req, res){
 
         const seatsRemaining = sectionResult.rows[0].seats_remaining
 
+        // no seats, waitlist the student
         if(seatsRemaining <= 0){
-            await waitlistQueue.add("waitlist-job", {
-                studentId,
-                sectionId
-            })
+            const positionResult = await client.query( // position max + 1 as the next higher position in the queue (previous last position + 1)
+                `
+                SELECT COALESCE(MAX(position), 0) + 1 AS next_position
+                FROM waitlist
+                WHERE section_id = $1
+                `,
+                [sectionId]
+            );
+            const nextPosition = positionResult.rows[0].next_position;
 
-            await client.query("COMMIT")
+            const waitlistId = uuidv4();
+            const insertResult = await client.query(
+                `
+                INSERT INTO waitlist (id, student_id, section_id, position)
+                VALUES ($1, $2, $3, $4)
+                ON CONFLICT (student_id, section_id) DO NOTHING
+                RETURNING position
+                `,
+                [waitlistId, studentId, sectionId, nextPosition]
+            );
+
+            await client.query("COMMIT");
+
+            // if the student is already on the wailist
+            if (insertResult.rowCount === 0) {
+                const existing = await pool.query(
+                    `SELECT position FROM waitlist WHERE student_id = $1 AND section_id = $2`,
+                    [studentId, sectionId]
+                );
+                return res.send({
+                    waitlisted: true,
+                    alreadyOnWaitlist: true,
+                    position: existing.rows[0]?.position ?? null
+                });
+            }
 
             return res.send({
-                waitlisted: true
-            })
+                waitlisted: true,
+                position: insertResult.rows[0].position
+            });
         }
 
         const enrollmentId = uuidv4()
