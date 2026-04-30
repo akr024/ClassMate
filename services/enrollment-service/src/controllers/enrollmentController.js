@@ -31,10 +31,12 @@ export async function enrollStudent(req, res) {
                     [enrollmentId, studentId, sectionId]
                 );
             } catch (err) {
-                await client.query("ROLLBACK");
-                return res.status(409).send({
-                    error: "Student already enrolled in this section"
-                });
+                if (err.code === "23505") {
+                    await client.query("ROLLBACK");
+                    return res.status(409).send({
+                        error: "Student already enrolled in this section"
+                    });
+                }
                 throw err;
             }
 
