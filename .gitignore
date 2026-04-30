@@ -4,6 +4,8 @@ Thumbs.db
 
 dump.rdb
 
+private-notes.md
+
 # Build Artifacts
 build/
 dist/
