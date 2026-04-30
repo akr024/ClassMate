@@ -1,0 +1,6 @@
+Load test: 500 concurrent requests, 10 seats
+Section created: bef8901c-d6ad-4b9f-b75b-6cfcfecb48cb
+Completed in 219ms (2283 req/s)
+Server said enrolled: 10
+DB enrollments:       10
+PASS: 10 students enrolled, 490 waitlisted, no oversubscription.
