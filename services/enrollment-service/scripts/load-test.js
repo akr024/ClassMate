@@ -99,7 +99,7 @@ async function main() {
     console.log(`Completed in ${wallMs}ms (${(N_REQUESTS / wallMs * 1000).toFixed(0)} req/s)`);
 
     const result = await checkResults(sectionId, responses);
-    console.log(`Server said enrolled: ${result.serverEnrolled}`);
+    console.log(`Server side enrolled: ${result.serverEnrolled}`);
     console.log(`DB enrollments:       ${result.dbEnrolled}`);
 
     if (result.oversubscribed) {
